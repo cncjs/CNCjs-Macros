@@ -1,0 +1,102 @@
+;Start with end mill above the probe, near the center
+
+; Wait until the planner queue is empty
+%wait
+
+; Set user-defined variables
+%Z_PROBE_THICKNESS = 22	;thickness of Z probe plate
+%X_PROBE_THICKNESS = 7	;thickness of X probe plate
+%Y_PROBE_THICKNESS = 7	;thickness of Y probe plate
+%PROBE_DISTANCE = 50  ;Max distance for a probe motion
+%PROBE_FEEDRATE_A = 150
+%PROBE_FEEDRATE_B = 50
+%Y_PROBE_DIM = 50	;length of probe Y
+%X_PROBE_DIM = 50	;width of probe X
+%XY_PROBE_DEPTH = 5	;depth below probe block surface to probe X & Y
+
+
+%UNITS=modal.units
+%DISTANCE=modal.distance
+
+
+G91 ; Relative positioning
+G21 ;Use millimeters
+
+;Probe Z
+G38.2 Z[-PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
+G0 Z2 ;retract 2mm
+G38.2 Z-5 F[PROBE_FEEDRATE_B] ;Slow Probe
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.25
+
+;Set Z0
+G10 L20 Z[Z_PROBE_THICKNESS]
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.25
+
+;Move to Y loc
+G0 Z10 Y[Y_PROBE_DIM]
+G0 Z-[10+XY_PROBE_DEPTH]
+
+;Probe toward top (Y pos)
+G38.2 Y[-PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
+G0 Y2 ;retract 2mm
+G38.2 Y-5 F[PROBE_FEEDRATE_B] ;Slow Probe
+%Y_TOP = [posy]
+
+;Move to other Y
+G0 Y10 Z[10+XY_PROBE_DEPTH]
+G0 Y-[Y_PROBE_DIM + 25]
+G0 Z-[10+XY_PROBE_DEPTH]
+
+;Probe toward bottom (Y neg)
+G38.2 Y[PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
+G0 Y-2 ;retract 2mm
+G38.2 Y5 F[PROBE_FEEDRATE_B] ;Slow Probe
+%Y_BOTTOM = [posy]
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.25
+
+;Calculate radius of endmill
+%ENDMILL_RADIUS = [(Y_TOP-Y_BOTTOM-Y_PROBE_DIM)/2]
+
+;Set Y0
+G10 L20 Y[0-ENDMILL_RADIUS-Y_PROBE_THICKNESS]
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.25
+
+;Move to X probe area
+G0 Y-10 Z[10+XY_PROBE_DEPTH]
+G0 Y30 X-[X_PROBE_DIM]
+G0 Z-[10+XY_PROBE_DEPTH]
+
+;Probe X
+G38.2 X[PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
+G0 X-2 ;retract 2mm
+G38.2 X5 F[PROBE_FEEDRATE_B] ;Slow Probe
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.25
+
+;Set X0
+G10 L20 X[0-ENDMILL_RADIUS-X_PROBE_THICKNESS]
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.25
+
+;Move to Final loc
+G0 X-10 Z[10+XY_PROBE_DEPTH]
+G90	;absolute distance
+G0 X0 Y0
+
+%TOOL_DIAMETER = ENDMILL_RADIUS*2
+
+; A dwell time of half second to make sure the planner queue is empty
+G4 P0.5 (Tool Diameter = [TOOL_DIAMETER])
+
+[UNITS] [DISTANCE] ;restore unit and distance modal state
+
