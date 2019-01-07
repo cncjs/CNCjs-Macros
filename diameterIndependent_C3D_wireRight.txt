@@ -1,4 +1,5 @@
 ;Start with end mill above the probe, near the center
+;This macro works best with 3 axis probe blocks that the connecting wire is on the right
 
 ; Wait until the planner queue is empty
 %wait
