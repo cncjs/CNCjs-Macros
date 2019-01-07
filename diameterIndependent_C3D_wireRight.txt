@@ -1,10 +1,10 @@
 ;Start with end mill above the probe, near the center
 ;This macro works best with 3 axis probe blocks that the connecting wire is on the right
 
-; Wait until the planner queue is empty
+;Wait until the planner queue is empty
 %wait
 
-; Set user-defined variables
+;Set user-defined variables
 %Z_PROBE_THICKNESS = 22	;thickness of Z probe plate
 %X_PROBE_THICKNESS = 7	;thickness of X probe plate
 %Y_PROBE_THICKNESS = 7	;thickness of Y probe plate
