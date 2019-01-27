@@ -5,7 +5,7 @@
 ;Following set probe location
 %TOOL_PROBE_X = -30	;machine coordinates
 %TOOL_PROBE_Y = -350	;machine coordinates
-%TOOL_PROBE_Z = -10	;machine coordinates
+%TOOL_PROBE_Z = -10	;machine coordinates --> lower this (more negative) to start the probig closer to wasteboard
 
 %PROBE_DISTANCE = 100
 %PROBE_FEEDRATE = 75
@@ -48,15 +48,15 @@ G38.2 Z-[PROBE_DISTANCE] F[PROBE_FEEDRATE]
 G0 Z2 ;lift 2mm
 G38.2 Z-5 F45 ;Probe Z
 G90 ; Absolute positioning
-%ORIGINAL_TOOL = [posz]
+%ORIGINAL_TOOL = [posz] ;store current work position
 ; A dwell time of one second to make sure the planner queue is empty
 G4 P1
 
-; Retract from the touch plate
+; Retract from the touch plate for tool change
 G91 ; Relative positioning
 G0 Z[RETRACTION_DISTANCE]
 G90
-G53 Z[TOOL_CHANGE_Z]
+G53 Z[SAFE_HEIGHT]
 
 ; Wait until the planner queue is empty
 %wait
