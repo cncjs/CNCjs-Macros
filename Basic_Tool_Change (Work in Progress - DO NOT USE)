@@ -2,16 +2,16 @@
 %wait
 
 ; Set user-defined variables
-%CLEARANCE_HEIGHT = 100
+%CLEARANCE_HEIGHT = -10 ;MACHINE Coordinates
 %TOOL_CHANGE_X = -300
 %TOOL_CHANGE_Y = -300
 %TOOL_CHANGE_Z = CLEARANCE_HEIGHT
 %TOOL_PROBE_X = 0
 %TOOL_PROBE_Y = 0
-%TOOL_PROBE_Z = 20
-%PROBE_DISTANCE = 15
+%TOOL_PROBE_Z = 50
+%PROBE_DISTANCE = 50
 %PROBE_FEEDRATE = 20
-%TOUCH_PLATE_HEIGHT = 10
+%Z_PROBE_THICKNESS  = 10
 %RETRACTION_DISTANCE = 10
 
 ; Keep a backup of current work position
@@ -64,7 +64,9 @@ G38.2 Z-[PROBE_DISTANCE] F[PROBE_FEEDRATE]
 G90 ; Absolute positioning
 
 ; Set Z0 for the active work coordinate system
-G10 L20 P0 Z[TOUCH_PLATE_HEIGHT]
+G10 L20 Z[Z_PROBE_THICKNESS ]
+; A dwell time of one second to make sure the planner queue is empty
+G4 P1
 
 ; Retract from the touch plate
 G91 ; Relative positioning
