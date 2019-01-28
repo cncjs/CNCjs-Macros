@@ -1,3 +1,5 @@
+;This macro allows you to use a fixed machine location for a tool change/probe. Ideal when you're workpiece surface has been carved away.
+
 ; Wait until the planner queue is empty
 %wait
 ; Set user-defined variables
