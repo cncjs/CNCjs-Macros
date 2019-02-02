@@ -1,5 +1,5 @@
 ;Start with end mill above the probe, near the center
-;This macro works best with 3 axis probe blocks that the connecting wire is on the right
+;This macro works best with 3 axis probe blocks that the connecting wire is on the BACK
 
 ;Wait until the planner queue is empty
 %wait
@@ -45,7 +45,7 @@ G0 Z-[10+XY_PROBE_DEPTH]
 G38.2 X[-PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 X2 ;retract 2mm
 G38.2 X-5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%X_TOP = [posx]
+%X_BOTTOM = [posx]
 
 ;Move to other X
 G0 X10 Z[10+XY_PROBE_DEPTH]
@@ -56,7 +56,7 @@ G0 Z-[10+XY_PROBE_DEPTH]
 G38.2 X[PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 X-2 ;retract 2mm
 G38.2 X5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%X_BOTTOM = [posx]
+%X_TOP = [posx]
 
 ; A dwell time of half second to make sure the planner queue is empty
 G4 P0.25
