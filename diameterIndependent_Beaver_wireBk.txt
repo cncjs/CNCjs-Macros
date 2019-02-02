@@ -41,25 +41,25 @@ G4 P0.25
 G0 Z10 X[X_PROBE_DIM]
 G0 Z-[10+XY_PROBE_DEPTH]
 
-;Probe toward right (X pos)
+;Probe toward right side (X pos)
 G38.2 X[-PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 X2 ;retract 2mm
 G38.2 X-5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%X_BOTTOM = [posx]
-G4 P0.05 (X BTM = [X_BOTTOM])
+%X_TOP = [posx]
+G4 P0.05 (X TOP = [X_TOP])
 ;Move to other X
 G0 X10 Z[10+XY_PROBE_DEPTH]
 G0 X-[X_PROBE_DIM + 25]
 G0 Z-[10+XY_PROBE_DEPTH]
 
-;Probe toward left (X neg)
+;Probe toward left side (X neg)
 G38.2 X[PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 X-2 ;retract 2mm
 G38.2 X5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%X_TOP = [posx]
+%X_BOTTOM = [posx]
 
 ; A dwell time of half second to make sure the planner queue is empty
-G4 P0.5 (X TOP = [X_TOP])
+G4 P0.5 (X BOTTOM = [X_BOTTOM])
 
 ;Calculate radius of endmill
 %ENDMILL_RADIUS = [(X_TOP-X_BOTTOM-X_PROBE_DIM)/2]
