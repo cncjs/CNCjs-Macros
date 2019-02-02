@@ -45,7 +45,7 @@ G0 Z-[10+XY_PROBE_DEPTH]
 G38.2 X[-PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 X2 ;retract 2mm
 G38.2 X-5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%Y_TOP = [posx]
+%X_TOP = [posx]
 
 ;Move to other X
 G0 X10 Z[10+XY_PROBE_DEPTH]
