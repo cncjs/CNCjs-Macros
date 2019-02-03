@@ -10,8 +10,8 @@
 %PROBE_DISTANCE = 50  ;Max distance for a probe motion
 %PROBE_FEEDRATE_A = 150
 %PROBE_FEEDRATE_B = 50
-%Y_PROBE_DIM = 50	;length of probe Y
-%X_PROBE_DIM = 50	;width of probe X
+%Y_PROBE_DIM = 65	;length of probe Y
+%X_PROBE_DIM = 65	;width of probe X
 %XY_PROBE_DEPTH = 5	;depth below probe block surface to probe X & Y
 
 
