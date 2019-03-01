@@ -1,21 +1,39 @@
-;This macro allows you to use a fixed machine location for a tool change/probe. Ideal when you're workpiece surface has been carved away.
+; This macro allows you to use a fixed machine location for a tool change and probe. It works by
+; probing twice, once to capture the position of the tool you're changing away from, and again to
+; set the adjusted WCS offset of the tool you're changing to.
 
-; Wait until the planner queue is empty
+; Using the macro in practice:
+; 1) Insert an M6 tool change command in your program, which will pause cncjs and allow you to
+;     execute this macro.
+; 2) The router retracts to a safe height and moves to a pre-defined location for tool changes and
+;     probing, then pauses.
+; 3) Turn off your router, set up your probe, and continue. This will probe to capture the position
+;     of your current tool and then retract back up to the tool change height and pause.
+; 4) Change out your tool, set up your probe, and continue. This will probe the new tool. When it
+;     reaches the probe, the end of the tool will be in precisely the same position as the original
+;     tool, but the Z position will be different, so we set the current Z offset to be the previously
+;     captured offset.
+; 5) Remove the probe and continue. The spindle will move back to the location it encountered
+;     the M6.
+; 6) Turn your router back on and resume execution of your program.
+
 %wait
-; Set user-defined variables
-%SAFE_HEIGHT = -5	;clear everything height (negative number, distance below Z limit)
-;Following set probe location
-%TOOL_PROBE_X = -30	;machine coordinates
-%TOOL_PROBE_Y = -350	;machine coordinates
-%TOOL_PROBE_Z = -20	;machine coordinates --> lower this (more negative) to start the probing closer to wasteboard
+G21 ; Metric
 
+; User-defined variables (***METRIC***)
+%SAFE_HEIGHT = -1 ; Height needed to clear everything (negative number, distance below Z limit)
+%TOOL_PROBE_X = -30 ; Machine coords
+%TOOL_PROBE_Y = -350 ; Machine coords
+%TOOL_PROBE_Z = -20   ; Machine coords
 %PROBE_DISTANCE = 100
-%PROBE_FEEDRATE = 75
-%RETRACTION_DISTANCE = 10
+%PROBE_FAST_FEEDRATE = 200 ; mm/min
+%PROBE_SLOW_FEEDRATE = 20 ; mm/min
 
+%wait
 
 ; Keep a backup of current work position
 %X0=posx, Y0=posy, Z0=posz
+
 ; Save modal state
 ; * Work Coordinate System: G54, G55, G56, G57, G58, G59
 ; * Plane: G17, G18, G19
@@ -31,67 +49,67 @@
 %FEEDRATE = modal.feedrate
 %SPINDLE = modal.spindle
 %COOLANT = modal.coolant
-; Stop spindle
-M5
-; Absolute positioning
+
+M5   ; Stop spindle
+
 G90
-; Go to Safe Z
 G53 Z[SAFE_HEIGHT]
-; Go to tool probe X,Y
 G53 X[TOOL_PROBE_X] Y[TOOL_PROBE_Y]
-G53 Z[TOOL_PROBE_Z]
-; Wait until the planner queue is empty
-%wait
-; Pause the program before probing
-M0
-; Probe toward workpiece with a maximum probe distance
-G91 ; Relative positioning
-G38.2 Z-[PROBE_DISTANCE] F[PROBE_FEEDRATE]
-G0 Z2 ;lift 2mm
-G38.2 Z-5 F45 ;Probe Z
-G90 ; Absolute positioning
-%ORIGINAL_TOOL = [posz] ;store current work position
-; A dwell time of one half second to make sure the planner queue is empty
-G4 P0.5
 
-; Retract from the touch plate for tool change
-G91 ; Relative positioning
-G0 Z[RETRACTION_DISTANCE]
+%wait
+
+; Set up for probing
+M0
+
+G53 Z[TOOL_PROBE_Z]
+G91
+G38.2 Z-[PROBE_DISTANCE] F[PROBE_FAST_FEEDRATE]
+G0 Z1
+G38.2 Z-2 F[PROBE_SLOW_FEEDRATE]
+
+G90
+%ORIGINAL_TOOL = posz
+
+%wait
+
+G91
+G0 Z5
 G90
 G53 Z[SAFE_HEIGHT]
 
-; Wait until the planner queue is empty
 %wait
-; Pause the program for a manual tool change
-M0
-; Wait until the planner queue is empty
-%wait
-G53 Z[TOOL_PROBE_Z]
 
-; Probe toward workpiece with a maximum probe distance
-G91 ; Relative positioning
-G38.2 Z-[PROBE_DISTANCE] F[PROBE_FEEDRATE]
-G0 Z2 ;lift 2mm
-G38.2 Z-25 F45 ;Probe Z
-G90 ; Absolute positioning
-; A dwell time of one second to make sure the planner queue is empty
-G4 P0.25
-; Update Z offset for new tool
-G10 L20 Z[ORIGINAL_TOOL]
-; A dwell time of one second to make sure the planner queue is empty
-G4 P0.25
-; Retract from the touch plate
-G91 ; Relative positioning
-G0 Z[RETRACTION_DISTANCE]
-G90 ; Absolute positioning
-; Raise to tool change Z
-G53 Z[SAFE_HEIGHT]
-; Wait until the planner queue is empty
-%wait
-; Pause the program for cleanup (e.g. remove touch plate, wires, etc)
+; Manual tool change & probing
 M0
+
+G53 Z[TOOL_PROBE_Z]
+G91
+G38.2 Z-[PROBE_DISTANCE] F[PROBE_FAST_FEEDRATE]
+G0 Z1
+G38.2 Z-2 F[PROBE_SLOW_FEEDRATE]
+
+G90
+
+%wait
+
+; Update Z offset for new tool to be that of original tool
+G10 L20 Z[ORIGINAL_TOOL]
+
+%wait
+
+G91
+G0 Z5
+G90
+G53 Z[SAFE_HEIGHT]
+
+%wait
+
+; Cleanup (e.g. remove touch plate, wires, etc)
+M0
+
 ; Go to previous work position
 G0 X[X0] Y[Y0]
 G0 Z[Z0]
+
 ; Restore modal state
 [WCS] [PLANE] [UNITS] [DISTANCE] [FEEDRATE] [SPINDLE] [COOLANT]
