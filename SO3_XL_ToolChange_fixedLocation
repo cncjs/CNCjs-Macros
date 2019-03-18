@@ -35,6 +35,7 @@
 M5
 ; Absolute positioning
 G90
+G21 ;Force metric mode
 ; Go to Safe Z
 G53 Z[SAFE_HEIGHT]
 ; Go to tool probe X,Y
