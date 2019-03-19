@@ -44,7 +44,7 @@ G0 Z-[10+XY_PROBE_DEPTH]
 G38.2 Y[-PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 Y2 ;retract 2mm
 G38.2 Y-5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%Y_TOP = [posy]
+%Y_TOP = posy
 
 ;Move to other Y
 G0 Y10 Z[10+XY_PROBE_DEPTH]
@@ -55,13 +55,13 @@ G0 Z-[10+XY_PROBE_DEPTH]
 G38.2 Y[PROBE_DISTANCE] F[PROBE_FEEDRATE_A]
 G0 Y-2 ;retract 2mm
 G38.2 Y5 F[PROBE_FEEDRATE_B] ;Slow Probe
-%Y_BOTTOM = [posy]
+%Y_BOTTOM = posy
 
 ; A dwell time of half second to make sure the planner queue is empty
 G4 P0.25
 
 ;Calculate radius of endmill
-%ENDMILL_RADIUS = [(Y_TOP-Y_BOTTOM-Y_PROBE_DIM)/2]
+%ENDMILL_RADIUS = (Y_TOP-Y_BOTTOM-Y_PROBE_DIM)/2
 
 ;Set Y0
 G10 L20 Y[0-ENDMILL_RADIUS-Y_PROBE_THICKNESS]
