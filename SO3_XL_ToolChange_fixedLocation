@@ -51,7 +51,7 @@ G38.2 Z-[PROBE_DISTANCE] F[PROBE_FEEDRATE]
 G0 Z2 ;lift 2mm
 G38.2 Z-5 F45 ;Probe Z
 G90 ; Absolute positioning
-%ORIGINAL_TOOL = [posz] ;store current work position
+%ORIGINAL_TOOL = posz ;store current work position
 ; A dwell time of one half second to make sure the planner queue is empty
 G4 P0.5
 
