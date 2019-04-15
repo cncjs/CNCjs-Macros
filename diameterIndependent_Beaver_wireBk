@@ -11,6 +11,7 @@
 %PROBE_DISTANCE = 50  ;Max distance for a probe motion
 %PROBE_FEEDRATE_A = 150
 %PROBE_FEEDRATE_B = 50
+%TRAVEL_FEEDRATE = 500 ;Feed for travel moves (rapids might be too rapid)
 %Y_PROBE_DIM = 50	;length of probe Y
 %X_PROBE_DIM = 50	;width of probe X
 %XY_PROBE_DEPTH = 5	;depth below probe block surface to probe X & Y
@@ -38,7 +39,8 @@ G10 L20 Z[Z_PROBE_THICKNESS]
 G4 P0.25
 
 ;Move to X loc
-G0 Z10 X[X_PROBE_DIM]
+G0 Z10 
+G1 X[X_PROBE_DIM] F[TRAVEL_FEEDRATE]
 G0 Z-[10+XY_PROBE_DEPTH]
 
 ;Probe toward right side (X pos)
@@ -48,8 +50,9 @@ G38.2 X-5 F[PROBE_FEEDRATE_B] ;Slow Probe
 %X_TOP = posx
 G4 P0.05 (X TOP = [X_TOP])
 ;Move to other X
-G0 X10 Z[10+XY_PROBE_DEPTH]
-G0 X-[X_PROBE_DIM + 25]
+G1 X10 F[TRAVEL_FEEDRATE]
+G0 Z[10+XY_PROBE_DEPTH]
+G1 X-[X_PROBE_DIM + 25]
 G0 Z-[10+XY_PROBE_DEPTH]
 
 ;Probe toward left side (X neg)
@@ -71,8 +74,9 @@ G10 L20 X[0-ENDMILL_RADIUS-X_PROBE_THICKNESS]
 G4 P0.25
 
 ;Move to Y probe area
-G0 X-10 Z[10+XY_PROBE_DEPTH]
-G0 X30 Y-[Y_PROBE_DIM]
+G1 X-10 
+G0 Z[10+XY_PROBE_DEPTH]
+G1 X30 Y-[Y_PROBE_DIM]
 G0 Z-[10+XY_PROBE_DEPTH]
 
 ;Probe Y
@@ -90,9 +94,10 @@ G10 L20 Y[0-ENDMILL_RADIUS-Y_PROBE_THICKNESS]
 G4 P0.25
 
 ;Move to Final loc
-G0 Y-10 Z[10+XY_PROBE_DEPTH]
+G1 Y-10 
+G0 Z[10+XY_PROBE_DEPTH]
 G90	;absolute distance
-G0 X0 Y0
+G1 X0 Y0
 
 %TOOL_DIAMETER = ENDMILL_RADIUS*2
 
