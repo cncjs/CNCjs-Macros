@@ -1,4 +1,4 @@
-;Start with end mill above the probe, near the center
+;Start with end mill above the probe, near corner of the workpiece
 ;This macro works best with 3 axis probe blocks that the connecting wire is on the BACK
 
 ;Wait until the planner queue is empty
@@ -52,7 +52,7 @@ G4 P0.05 (X TOP = [X_TOP])
 ;Move to other X
 G1 X10 F[TRAVEL_FEEDRATE]
 G0 Z[10+XY_PROBE_DEPTH]
-G1 X-[X_PROBE_DIM + 25]
+G1 X-[X_PROBE_DIM + 15]
 G0 Z-[10+XY_PROBE_DEPTH]
 
 ;Probe toward left side (X neg)
@@ -74,7 +74,7 @@ G10 L20 X[0-ENDMILL_RADIUS-X_PROBE_THICKNESS]
 G4 P0.25
 
 ;Move to Y probe area
-G1 X-10 
+G1 X-10 F[TRAVEL_FEEDRATE]
 G0 Z[10+XY_PROBE_DEPTH]
 G1 X30 Y-[Y_PROBE_DIM]
 G0 Z-[10+XY_PROBE_DEPTH]
@@ -94,7 +94,7 @@ G10 L20 Y[0-ENDMILL_RADIUS-Y_PROBE_THICKNESS]
 G4 P0.25
 
 ;Move to Final loc
-G1 Y-10 
+G1 Y-10 F[TRAVEL_FEEDRATE]
 G0 Z[10+XY_PROBE_DEPTH]
 G90	;absolute distance
 G1 X0 Y0
