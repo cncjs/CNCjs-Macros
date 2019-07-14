@@ -1,0 +1,13 @@
+Home Machine
+Load first tool
+Zero all axes
+Edit Initial_Tool macro for your probing location
+Run Initial Tool Macro
+Start job (It will see the M6 for the first tool which is already loaded…just resume)
+It will run first operation.
+On next tool change call, run New_Tool macro
+When done it will run second op
+Repeat steps 8 & 9 as needed
+
+For reference and sample file for testing/practicing see:
+https://community.carbide3d.com/t/automatic-tool-length-offset/8480/30?u=neilferreri
