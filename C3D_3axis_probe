@@ -3,7 +3,7 @@
 ; Set user-defined variables
 %ENDMILL_DIAMETER = 3.175	;in millimeters
 
-%PROBE_BLOCK_Z = 22 ;Thickness of 3-axis probe in Z direction
+%PROBE_BLOCK_Z = 22;Thickness of 3-axis probe in Z direction
 %PROBE_BLOCK_Y = 7 ;Thickness of 3-axis probe in Y direction
 %PROBE_BLOCK_X = 7 ;Thickness of 3-axis probe in X direction
 
