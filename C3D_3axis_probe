@@ -14,14 +14,18 @@ G91 ;Incremental mode
 G38.2 Z-25 F75	;Probe Z
 G0 Z2	;lift 2mm
 G38.2 Z-25 F45	;Probe Z
+G4 P0.1
 G10 L20 P1 Z[PROBE_BLOCK_Z]	;Set Current Z as plate thickness
+G4 P0.1
 G0 Z3 ;lift Z 3mm
 G0 X-25	;Move left 25mm
 G0 Z-10	;Move down 10mm, should be 7mm below probe surface
 G38.2 X25 F75	;Probe X to the right 25mm
 G0 X-2
 G38.2 X25 F45	;Probe X to the right 25mm
+G4 P0.1
 G10 L20 P1 X[-ENDMILL_DIAMETER/2 -PROBE_BLOCK_X]	;Set current X location as negative half the bit diameter
+G4 P0.1
 G0 X-10	;Move left 10mm
 G0 Y-25	;Move forward 25mm
 G90 G0 X5	;Move to X5 (absolute) - will put you 5mm to the right of left edge of stock
@@ -29,7 +33,9 @@ G91 ;incremental
 G38.2 Y25 F75	;Probe Y
 G0 Y-2
 G38.2 Y25 F45	;Probe Y
+G4 P0.1
 G10 L20 P1 Y[-ENDMILL_DIAMETER/2 -PROBE_BLOCK_Y]	;Set current Y location as negative half the bit diameter - 7mm thickness
+G4 P0.1
 G0 Y-10	;Move Y-10
 G0 Z10	;Move Z up 10mm, should be 3mm above probe plate
 G90
