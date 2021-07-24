@@ -1,7 +1,7 @@
 Home Machine
 Load first tool
 Zero all axes
-Edit Initial_Tool macro for your probing location
+(First run only) Edit Initial_Tool macro for your probing location
 Run Initial Tool Macro
 Start job (It will see the M6 for the first tool which is already loaded…just resume)
 It will run first operation.
