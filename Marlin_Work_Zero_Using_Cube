@@ -3,7 +3,7 @@
 ;
 ; !! Intended for Marlin 2.xx users, but may work for other firmware with slight adjustments
 ;
-; Link to (3D printable) Zeroing Cube used in this script: https://www.thingiverse.com/thing:4809964
+; Link to (3D printable) Zeroing Cube used in this script: https://www.thingiverse.com/thing:5029043
 
 ; Start with end mill roughly in center of cube, with bit slightly (~3mm-10mm) above cube surface.
 ; Bit must extend BELOW the top of the zero cube walls (so it touches them on a lateral move)
