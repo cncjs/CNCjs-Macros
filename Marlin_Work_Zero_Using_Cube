@@ -13,87 +13,65 @@
 
 ; Set user-defined variables
 ; !! All measurements are in mm (not in Luddite units, you savages)
-%WIDEST_BIT_YOU_OWN = 20        ; Diameter of the widest bit you'll ever use with this script
-%ZERO_CUBE_HEIGHT = 8	          ; Height of main section of Zero Cube
-%ZERO_CUBE_WALL_HEIGHT = 12	    ; How high the XY wall section extends above %ZERO_CUBE_HEIGHT (ie: NOT the total height)
-%ZERO_CUBE_WALL_THICKNESS = 5	  ; How wide (laterally thick) are the XY wall sections which extend above %ZERO_CUBE_HEIGHT
-%PROBE_XY_DISTANCE = 40         ; Max distance for a probe motion (script will fail if bit further from wall than this)
-%PROBE_FEEDRATE_FAST = 200      ; mm/min
-%PROBE_FEEDRATE_SLOW = 100      ; mm/min
-%PROBE_RETRACT = 20             ; Distance of retract before probing next axis
-%Z_FINAL = 10	                  ; Desired height of bit above ZERO_CUBE_WALL_HEIGHT after probing is finished
-
+%WIDEST_BIT_YOU_OWN = 30        ; Diameter of the widest bit you'll ever use with this script
+%CUBE_HEIGHT = 7	          ; Height of main section of Zero Cube
+%CUBE_WALL_HEIGHT = 12	    ; How high the XY wall section extends above the base
+%CUBE_WALL_THICKNESS = 6	  ; How wide (laterally thick) are the XY wall sections
+%PROBE_XY_DISTANCE = 150         ; Max distance for a probe motion (script will fail if bit further from wall than this)
+%PROBE_FEEDRATE = 40      ; mm/min
+%Z_FINAL = 10	                  ; Desired height of bit above CUBE_WALL_HEIGHT after probing is finished
 
 %UNITS=modal.units
 %DISTANCE=modal.distance
 
-
 G91     ; Relative positioning
 G21     ; Use millimeters
 G54     ; Switch to Work Coordinate Set 1 (as opposed to Machine Coords, which should not be altered after homing)
-
-; Make sure initial coordinates remain positive for easier math
-G92 X[PROBE_XY_DISTANCE * 2 + ZERO_CUBE_WALL_THICKNESS] Y[PROBE_XY_DISTANCE * 2 + ZERO_CUBE_WALL_THICKNESS] Z[ZERO_CUBE_WALL_HEIGHT]
+M211 S0 ; Disable software endstops
 
 ; Probe Z
-G38.2 Z-[ZERO_CUBE_WALL_HEIGHT] F[PROBE_FEEDRATE_FAST]
-G0 Z2 ; Retract 2mm
-G38.2 Z-4 F[PROBE_FEEDRATE_SLOW] ; Slow Probe
-G92 Z[ZERO_CUBE_HEIGHT]
+G38.2 Z-[CUBE_WALL_HEIGHT] F[PROBE_FEEDRATE/2]
+G92 Z[CUBE_HEIGHT]
 G0 Z3	; Raise Z
-; A dwell time of one second to make sure the planner queue is empty
-G4 P1
 
 ; Probe X to find side of bit
-G38.2 X-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE_FAST]
+G38.2 X-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE]
+G92 X0
+%X1 = posx
 G0 X2 ; Retract 2mm
-G38.2 X-4 F[PROBE_FEEDRATE_SLOW] ; Slow Probe
-%X_LEFT = posx
-G0 Z[ZERO_CUBE_WALL_HEIGHT]	; Retract Z above wall
-G0 X-[WIDEST_BIT_YOU_OWN + ZERO_CUBE_WALL_THICKNESS + 10]	; Move to other side of wall
-G0 -Z[ZERO_CUBE_WALL_HEIGHT]	; Drop Z below wall
+M117 Determining bit width
+G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
+%X_MOVE = WIDEST_BIT_YOU_OWN + CUBE_WALL_THICKNESS + 10
+G0 X-[X_MOVE]	; Move to other side of wall
+G0 Z-[CUBE_WALL_HEIGHT]	; Drop Z below wall
 
 ; Probe X to find other side of bit
-G38.2 X[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE_FAST]
-G0 X-2 ; Retract 2mm
-G38.2 X4 F[PROBE_FEEDRATE_SLOW] ; Slow Probe
-%X_RIGHT = posx
-%X_DIFFERENCE = X_LEFT - X_RIGHT + ZERO_CUBE_WALL_THICKNESS
-G0 Z[ZERO_CUBE_WALL_HEIGHT]	; Retract Z above wall
-G0 X[X_DIFFERENCE / 2] ; Move to where the center of the bit is at zero (the right edge of the left wall)
+G38.2 X[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE]
+%X2 = posx
+%BIT_DIAMETER = X1 - X2 - CUBE_WALL_THICKNESS
+%BIT_RADIUS = BIT_DIAMETER / 2
+M117 Your bit's Diameter is: [BIT_DIAMETER], Radius: [BIT_RADIUS]
+G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
+M117 Moving to new X0
+%NEW_ZERO = CUBE_WALL_THICKNESS + BIT_RADIUS
+G0 X[NEW_ZERO]
 G92 X0
-G0 X[WIDEST_BIT_YOU_OWN] ; Position X for Y probing
-G0 -Z[ZERO_CUBE_WALL_HEIGHT]	; Drop Z below wall
 
-; A dwell time of one second to make sure the planner queue is empty
-G4 P1
+G0 X[WIDEST_BIT_YOU_OWN] ; Position X for Y probing
+G0 Z-[CUBE_WALL_HEIGHT]	; Drop Z below wall
 
 ; Probe Y to find side of bit
-G38.2 Y-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE_FAST]
-G0 Y2 ; Retract 2mm
-G38.2 Y-4 F[PROBE_FEEDRATE_SLOW] ; Slow Probe
-%Y_TOP = posy
-G0 Z[ZERO_CUBE_WALL_HEIGHT]	; Retract Z above wall
-G0 Y-[WIDEST_BIT_YOU_OWN + ZERO_CUBE_WALL_THICKNESS + 10]	; Move to other side of wall
-G0 -Z[ZERO_CUBE_WALL_HEIGHT]	; Drop Z below wall
-
-; Probe Y to find other side of bit
-G38.2 Y[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE_FAST]
-G0 Y-2 ; Retract 2mm
-G38.2 Y4 F[PROBE_FEEDRATE_SLOW] ; Slow Probe
-%Y_BOTTOM = posy
-%Y_DIFFERENCE = Y_TOP - Y_BOTTOM + ZERO_CUBE_WALL_THICKNESS
-G0 Z[ZERO_CUBE_WALL_HEIGHT]	; Retract Z above wall
-G0 Y[Y_DIFFERENCE / 2] ; Move to where the center of the bit is at zero (the top edge of the lower wall)
+G38.2 Y-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE]
+G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
+G0 Y-[BIT_RADIUS]
 G92 Y0
 
 ; Place bit center at final X0 Y0
 G90	; Absolute positioning
-G0 X0 Y0 Z[ZERO_CUBE_HEIGHT + ZERO_CUBE_WALL_HEIGHT + Z_FINAL]
+%FINAL_MOVE = CUBE_HEIGHT + CUBE_WALL_HEIGHT + Z_FINAL
+G0 X0 Y0 Z[FINAL_MOVE]
 
-; A dwell time of one second to make sure the planner queue is empty
-G4 P1
-
+M211 S1 ; Re-enable software endstops
 [UNITS] [DISTANCE] ; Restore unit and distance modal state
 
-; All finished and ready to carve!
+M117 All finished!
