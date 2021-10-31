@@ -13,13 +13,13 @@
 
 ; Set user-defined variables
 ; !! All measurements are in mm (not in Luddite units, you savages)
-%WIDEST_BIT_YOU_OWN = 30        ; Diameter of the widest bit you'll ever use with this script
-%CUBE_HEIGHT = 7	          ; Height of main section of Zero Cube
-%CUBE_WALL_HEIGHT = 12	    ; How high the XY wall section extends above the base
-%CUBE_WALL_THICKNESS = 6	  ; How wide (laterally thick) are the XY wall sections
+%WIDEST_BIT_YOU_OWN = 15        ; Diameter of the widest bit you'll ever use with this script
+%CUBE_HEIGHT = 6.2	          ; Height of main section of Zero Cube
+%CUBE_WALL_HEIGHT = 13	    ; How high the XY wall section extends above the base
+%CUBE_WALL_THICKNESS = 6.5	  ; How wide (laterally thick) are the XY wall sections
 %PROBE_XY_DISTANCE = 150         ; Max distance for a probe motion (script will fail if bit further from wall than this)
-%PROBE_FEEDRATE = 40      ; mm/min
-%Z_FINAL = 10	                  ; Desired height of bit above CUBE_WALL_HEIGHT after probing is finished
+%PROBE_FEEDRATE = 30      ; mm/min
+%Z_FINAL = 25.4	                  ; Desired height of bit from bed after probing is finished
 
 %UNITS=modal.units
 %DISTANCE=modal.distance
@@ -68,8 +68,7 @@ G92 Y0
 
 ; Place bit center at final X0 Y0
 G90	; Absolute positioning
-%FINAL_MOVE = CUBE_HEIGHT + CUBE_WALL_HEIGHT + Z_FINAL
-G0 X0 Y0 Z[FINAL_MOVE]
+G0 X0 Y0 Z[Z_FINAL]
 
 M211 S1 ; Re-enable software endstops
 [UNITS] [DISTANCE] ; Restore unit and distance modal state
