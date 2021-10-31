@@ -54,7 +54,7 @@ M117 Your bit's Diameter is: [BIT_DIAMETER], Radius: [BIT_RADIUS]
 G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
 M117 Moving to new X0
 %NEW_ZERO = CUBE_WALL_THICKNESS + BIT_RADIUS
-G92 X[NEW_ZERO]
+G92 X-[NEW_ZERO]
 
 G0 X[WIDEST_BIT_YOU_OWN] ; Position X for Y probing
 G0 Z-[CUBE_WALL_HEIGHT]	; Drop Z below wall
