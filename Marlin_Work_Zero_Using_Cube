@@ -13,13 +13,13 @@
 
 ; Set user-defined variables
 ; !! All measurements are in mm (not in Luddite units, you savages)
-%WIDEST_BIT_YOU_OWN = 15        ; Diameter of the widest bit you'll ever use with this script
-%CUBE_HEIGHT = 6.2	          ; Height of main section of Zero Cube
-%CUBE_WALL_HEIGHT = 13	    ; How high the XY wall section extends above the base
-%CUBE_WALL_THICKNESS = 6.5	  ; How wide (laterally thick) are the XY wall sections
-%PROBE_XY_DISTANCE = 150         ; Max distance for a probe motion (script will fail if bit further from wall than this)
-%PROBE_FEEDRATE = 30      ; mm/min
-%Z_FINAL = 25.4	                  ; Desired height of bit from bed after probing is finished
+%WIDEST_BIT_YOU_OWN = 8 ; Diameter of the widest bit you'll ever use with this script
+%CUBE_HEIGHT = 6.2 ; Height of main section of Zero Cube
+%CUBE_WALL_HEIGHT = 16 ; How high the XY wall section extends above the base
+%CUBE_WALL_THICKNESS = 6.5 ; How wide (laterally thick) are the XY wall sections
+%PROBE_XY_DISTANCE = 50 ; Max distance for a probe motion (script will fail if bit further from wall than this)
+%PROBE_FEEDRATE = 600 ; mm/min
+%Z_FINAL = 25.4 ; Desired height of bit from bed after probing is finished (25.4 is one inch)
 
 %UNITS=modal.units
 %DISTANCE=modal.distance
@@ -30,46 +30,47 @@ G54     ; Switch to Work Coordinate Set 1 (as opposed to Machine Coords, which s
 M211 S0 ; Disable software endstops
 
 ; Probe Z
-G38.2 Z-[CUBE_WALL_HEIGHT] F[PROBE_FEEDRATE/2]
-G92 Z[CUBE_HEIGHT]
-G0 Z2	; Raise Z
+G38.2 Z-[CUBE_WALL_HEIGHT] F[PROBE_FEEDRATE/2] (Probing Z)
+G92 Z[CUBE_HEIGHT] (Setting Z0)
+G0 Z2 (Raising Z)
 
 ; Probe X to find side of bit
-G38.2 X-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE]
-G92 X0 ; Temporary zero for easy math
+G38.2 X-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE] (Probing X)
+G92 X0 (Temporary zero for easy math)
 %X1 = posx
-G0 X2 ; Retract 2mm
+G0 X2 (Retracting 2mm)
 M117 Determining bit width
-G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
-%X_MOVE = WIDEST_BIT_YOU_OWN + CUBE_WALL_THICKNESS + 3
-G0 X-[X_MOVE]	; Move to other side of wall
-G0 Z-[CUBE_WALL_HEIGHT]	; Drop Z below wall
+G0 Z[CUBE_WALL_HEIGHT]	(Retract Z above wall)
+%X_MOVE = Number(WIDEST_BIT_YOU_OWN) + Number(CUBE_WALL_THICKNESS) + 5
+G0 X-[X_MOVE] (Move to other side of wall)
+G0 Z-[CUBE_WALL_HEIGHT] (Drop Z below wall)
 
 ; Probe X to find other side of bit
-G38.2 X[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE]
+G38.2 X[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE] (Probe X to find other side of bit)
 %X2 = posx
-%BIT_DIAMETER = X1 - X2 - CUBE_WALL_THICKNESS
+%BIT_DIAMETER = Math.abs(X1 - X2 - CUBE_WALL_THICKNESS)
 %BIT_RADIUS = BIT_DIAMETER / 2
 M117 Your bit's Diameter is: [BIT_DIAMETER], Radius: [BIT_RADIUS]
-G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
-M117 Moving to new X0
-%NEW_ZERO = CUBE_WALL_THICKNESS + BIT_RADIUS
-G92 X-[NEW_ZERO]
+G0 Z[CUBE_WALL_HEIGHT] (Retract Z above wall)
+M117 Setting new X0
+%NEW_ZERO = Number(CUBE_WALL_THICKNESS) + Number(BIT_RADIUS)
+G92 X-[NEW_ZERO] (New X0)
 
-G0 X[WIDEST_BIT_YOU_OWN] ; Position X for Y probing
-G0 Z-[CUBE_WALL_HEIGHT]	; Drop Z below wall
+%SAFE_X = Number(WIDEST_BIT_YOU_OWN) + Number(CUBE_WALL_THICKNESS) + 5
+G0 X[SAFE_X] (Position X for Y probing)
+G0 Z-[CUBE_WALL_HEIGHT] (Drop Z below wall)
 
 ; Probe Y to find side of bit
-G38.2 Y-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE]
-G92 Y[BIT_RADIUS]
-G0 Y2
-G0 Z[CUBE_WALL_HEIGHT]	; Retract Z above wall
+G38.2 Y-[PROBE_XY_DISTANCE] F[PROBE_FEEDRATE] (Probe Y to find side of bit)
+G92 Y[BIT_RADIUS] (Set new Y0)
+G0 Y2 (Back off Y)
+G0 Z[CUBE_WALL_HEIGHT] (Retract Z above wall)
 
 ; Place bit center at final X0 Y0
 G90	; Absolute positioning
-G0 X0 Y0 Z[Z_FINAL]
+G0 X0 Y0 Z[Z_FINAL] (Place bit center at final X0 Y0)
 
-M211 S1 ; Re-enable software endstops
-[UNITS] [DISTANCE] ; Restore unit and distance modal state
+M211 S1 (Re-enable software endstops)
+[UNITS] [DISTANCE] (Restore unit and distance modal state)
 
 M117 All finished!
